@@ -1,0 +1,5 @@
+NAME="NovaSec"
+VERSION="0.1"
+BASE="Kali Linux Rolling"
+ARCHITECTURE="amd64"
+

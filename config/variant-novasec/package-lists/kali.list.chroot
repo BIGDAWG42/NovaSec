@@ -1,0 +1,30 @@
+# Core Kali live system and lightweight Xfce desktop
+kali-linux-core
+kali-desktop-live
+kali-desktop-xfce
+
+# Networking and remote access
+network-manager
+network-manager-openvpn
+openssh-client
+wireguard-tools
+
+# Focused security toolkit
+nmap
+wireshark
+tcpdump
+netcat-openbsd
+ffuf
+gobuster
+nikto
+sqlmap
+
+# General utilities
+python3
+python3-pip
+git
+curl
+wget
+nano
+htop
+
