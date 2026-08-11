@@ -1,0 +1,66 @@
+name: Build NovaSec Kali Live ISO
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: novasec-iso-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+
+    steps:
+      - name: Check out NovaSec
+        uses: actions/checkout@v4
+
+      - name: Reclaim space on the temporary runner
+        shell: bash
+        run: |
+          set -euxo pipefail
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc
+          docker system prune --all --force
+          df -h /
+
+      - name: Pull Kali Rolling build environment
+        run: docker pull kalilinux/kali-rolling:latest
+
+      - name: Build the Kali Live ISO
+        shell: bash
+        run: |
+          set -euxo pipefail
+          docker run --rm --privileged \
+            --volume "$GITHUB_WORKSPACE:/workspace" \
+            --workdir /workspace \
+            --env NOVASEC_VERSION=0.1 \
+            kalilinux/kali-rolling:latest \
+            bash -lc '
+              set -euxo pipefail
+              export DEBIAN_FRONTEND=noninteractive
+              apt-get update
+              apt-get install -y --no-install-recommends git live-build cdebootstrap curl ca-certificates
+              bash ./build.sh
+            '
+
+      - name: Show result and checksum
+        shell: bash
+        run: |
+          set -euxo pipefail
+          ls -lh outputs/NovaSec-0.1-amd64.iso
+          sha256sum outputs/NovaSec-0.1-amd64.iso | tee outputs/NovaSec-0.1-amd64.iso.sha256
+
+      - name: Upload NovaSec ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: NovaSec-0.1-amd64
+          path: |
+            outputs/NovaSec-0.1-amd64.iso
+            outputs/NovaSec-0.1-amd64.iso.sha256
+            outputs/build.log
+          if-no-files-found: error
+          retention-days: 7
