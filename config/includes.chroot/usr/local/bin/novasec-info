@@ -1,2 +1,0 @@
-#!/bin/sh
-printf '%s\n' 'NovaSec 0.1' 'Lightweight live security workstation' 'Use only on systems you own or are authorized to test.'
